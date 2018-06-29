@@ -1,17 +1,15 @@
 <xml>
-    <!-- List of IP addresses that should have various hostnames redirected to it -->
-	
-        <!-- Example, 192.168.0.24 hosts both bob.com and joe.com -->
-        <entry ip="192.168.0.24">
-            <host>bob.com</host>
-            <host>joe.com</host>
-        </entry>
-		
-	<!-- Entries to point a host lookup to a computer name on the domain -->
-	
-        <!-- Example, redirect 'server' to Server-001.COMPANYDOMAIN.com -->
-        <entry host="server" cname="Server-001"/>
-        
-        <!-- Example, redirect 'www.google.com' to Server-002.COMPANYDOMAIN.com -->
-        <entry host="www.google.com" cname="Server-002" />
+  <!-- List of IP addresses that should have various hostnames redirected to it -->
+    <!-- Example, 192.168.0.24 hosts both bob.com and joe.com -->
+    <entry ip="192.168.0.24">
+      <host>bob.com</host>
+      <host>joe.com</host>
+    </entry>
+
+  <!-- Entries to point a host lookup to a computer name on the domain -->
+    <!-- Example, redirect 'server' to Server-001.COMPANYDOMAIN.com -->
+    <entry host="server" cname="Server-001"/>
+    
+    <!-- Example, redirect 'www.google.com' to Server-002.COMPANYDOMAIN.com -->
+    <!-- <entry host="www.google.com" cname="Server-002" /> -->
 </xml>

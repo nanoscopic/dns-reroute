@@ -3,22 +3,21 @@
 use Net::DNS;
 use Net::DNS::Nameserver;
 use strict;
-use XML::Bare qw/xval forcearray/;
+use XML::Bare qw/forcearray/;
 #use Data::Dumper;
 
 my %hosthash;
 my %iphash;
 
-my ( $ob, $xml ) = new XML::Bare( file => "conf.xml" );
+my ( $ob, $xml ) = XML::Bare->simple( file => "conf.xml" );
 $xml = $xml->{"xml"};
 my $entries = forcearray $xml->{"entry"};
 for my $entry ( @$entries ) {
-  my $ip = xval $entry->{"ip"};
+  my $ip = $entry->{"ip"};
   my $rip = $ip ? reverseip( $ip ) : 0;
-  my $cname = xval $entry->{"cname"};
+  my $cname = $entry->{"cname"};
   my $hosts = forcearray( $entry->{"host"} );
-  for my $host ( @$hosts ) {
-    my $hostname = xval $host;
+  for my $hostname ( @$hosts ) {
     $hosthash{ $hostname } = { ip => $ip, cname => $cname };
     if( $ip ) {
       if( !$iphash{ $rip } ) { $iphash{ $rip } = []; }
