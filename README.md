@@ -11,7 +11,18 @@ Fun bonus feature of the script is that it creates a log seeing everything queri
 various nonsense domains that are looked up constantly by Windows? Run this script and find out.
 
 # Usage
-1. Clone this repo
-1. Install the dependent CPAN modules Net::DNS and Net::DNS::Nameserver
-1. Replace 'COMPANYDOMAIN.com' in reroute.pl with the a domain you wish to redirect entries within.
-1. Alter example conf.xml as desired to redirect various things
+* Clone this repo
+* Install the libidn-devel package needed by Net::DNS
+  ```sh
+  sudo zypper in libidn-devel ( on OpenSUSE )
+  ```
+* Install the dependent CPAN modules Net::DNS and Net::DNS::Nameserver. These will both be installed if you install Net::DNS through CPAN.
+  ```sh
+  sudo cpan install Net::DNS
+  ```
+* Replace 'COMPANYDOMAIN.com' in reroute.pl with the a domain you wish to redirect entries within.
+* Alter example conf.xml as desired to redirect various things
+* Run the script as root ( root is required to bind to the default DNS port )
+  ```sh
+  sudo ./reroute.pl
+  ```
