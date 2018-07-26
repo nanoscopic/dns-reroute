@@ -1,9 +1,20 @@
 <xml>
+  <bindip>10.32.14.25</bindip>
+  
+  <!-- Comment this out to ignore AAAA ipv6 requests -->
+  <!-- With this enabled, AAAA ipv6 requests will be answered with upstream ipv4 answer -->
+  <allow_ipv6>1</allow_ipv6>
+
   <!-- List of IP addresses that should have various hostnames redirected to it -->
     <!-- Example, 192.168.0.24 hosts both bob.com and joe.com -->
     <entry ip="192.168.0.24">
       <host>bob.com</host>
       <host>joe.com</host>
+    </entry>
+    
+    <entry ip="10.32.14.25">
+      <host>oidctest.com</host>
+      <host>ldaptest.com</host>
     </entry>
 
   <!-- Entries to point a host lookup to a computer name on the domain -->
@@ -12,4 +23,9 @@
     
     <!-- Example, redirect 'www.google.com' to Server-002.COMPANYDOMAIN.com -->
     <!-- <entry host="www.google.com" cname="Server-002" /> -->
+    
+  <!-- Nameservers to use upstream. If none are specified Google DNS will be used -->
+  <nameserver ip="10.9.9.9" />
+  
+  <search domain="suse.de" />
 </xml>

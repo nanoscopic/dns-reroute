@@ -11,6 +11,10 @@ my %iphash;
 
 my ( $ob, $xml ) = XML::Bare->simple( file => "conf.xml" );
 $xml = $xml->{"xml"};
+
+my $bindip = $xml->{'bindip'};
+my $allow_ipv6 = $xml->{'allow_ipv6'} ? 1 : 0;
+
 my $entries = forcearray $xml->{"entry"};
 for my $entry ( @$entries ) {
   my $ip = $entry->{"ip"};
@@ -27,11 +31,28 @@ for my $entry ( @$entries ) {
   }
 }
 
+my @nameservers = qw/8.8.8.8 8.8.4.4/; # Default to Google DNS service
+if( $xml->{'nameserver'} ) {
+  @nameservers = ();
+  for my $ns ( @{ forcearray( $xml->{'nameserver'} ) } ) {
+    my $ns_ip = $ns->{'ip'};
+    push( @nameservers, $ns_ip );
+  }
+}
+
+my @searchdomain;
+if( $xml->{'search'} ) {
+  for my $ns ( @{ forcearray( $xml->{'search'} ) } ) {
+    my $dom = $ns->{'domain'};
+    push( @searchdomain, $dom );
+  }
+}
+
 my $res = Net::DNS::Resolver->new(
-  nameservers => [qw(8.8.8.8 8.8.4.4)],
+  nameservers => \@nameservers,
   recurse     => 1,
   debug       => 0,
-  searchlist => []
+  searchlist => \@searchdomain
 );
 
 sub reverseip {
@@ -46,18 +67,18 @@ sub reply_handler {
   my ($rcode, @ans, @auth, @add);
 
   if( $qtype ne "SRV" && $qtype ne "PTR" ) {
-    $qname =~ s/\.COMPANYDOMAIN.com$//g;
+    $qname =~ s/\.COMPANYDOMAIN\.COM$//g;
   }
    
   my %op;
   my $res2 = "";
-  if( $qtype eq "A" && $hosthash{ $qname } ) {
+  if( ( $qtype eq "A" || ( $allow_ipv6 && $qtype eq "AAAA" ) ) && $hosthash{ $qname } ) {
     my $info = $hosthash{ $qname };
     my $ip = $info->{"ip"};
     #print Dumper( $conn );
-    if( $conn->{'peerhost'} eq $ip ) {
-      $ip = "127.0.0.1";
-    }
+    #if( $conn->{'peerhost'} eq $ip ) {
+    #  $ip = "127.0.0.1";
+    #}
       
     if( $ip ) {
       my ($ttl, $rdata) = ( 3600, $ip );
@@ -79,7 +100,7 @@ sub reply_handler {
     }
     $op{ "aa" } = 1; # mark the answer as authoritive (by setting the 'aa' flag
   }
-  elsif( $qtype eq "AAAA" && $hosthash{ $qname } ) {
+  elsif( ( ! $allow_ipv6 ) && ( $qtype eq "AAAA" && $hosthash{ $qname } ) ) {
     $rcode = "NXDOMAIN";
   }
   else {
@@ -138,7 +159,7 @@ sub reply_handler {
 }
 
 my $ns = Net::DNS::Nameserver->new(
-  LocalAddr    => $ARGV[0]||"127.0.0.1",
+  LocalAddr    => $ARGV[0]||$bindip,
   LocalPort    => 53,
   ReplyHandler => \&reply_handler,
   Verbose      => 0,
